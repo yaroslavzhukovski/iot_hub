@@ -39,9 +39,23 @@ module "network" {
 module "private_dns" {
   source = "../../modules/private_dns"
 
-  resource_group_name = module.resource_group.name
-  private_dns_zones   = var.private_dns_zones
-  vnet_ids            = [module.network.vnet_id]
+  resource_group_name  = module.resource_group.name
+  private_dns_zones    = var.private_dns_zones
+  vnet_ids             = [module.network.vnet_id]
   registration_enabled = var.registration_enabled
-  tags                = module.naming.tags
+  tags                 = module.naming.tags
+}
+
+module "key_vault" {
+  source = "../../modules/key_vault"
+
+  key_vault_name             = module.naming.names.key_vault
+  location                   = var.location
+  resource_group_name        = module.resource_group.name
+  tags                       = module.naming.tags
+  tenant_id                  = var.tenant_id
+  sku_name                   = var.key_vault_sku_name
+  soft_delete_retention_days = var.key_vault_soft_delete_retention_days
+  purge_protection_enabled   = var.key_vault_purge_protection_enabled
+
 }

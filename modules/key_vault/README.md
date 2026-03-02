@@ -6,11 +6,11 @@ Create Key Vault in RBAC mode for secret access via Managed Identity.
 ## Inputs
 - `resource_group_name` (string)
 - `location` (string)
-- `name` (string)
+- `key_vault_name` (string)
 - `tenant_id` (string)
 - `sku_name` (string)
-- `enable_rbac_authorization` (bool)
-- `public_network_access_enabled` (bool)
+- `soft_delete_retention_days` (number)
+- `purge_protection_enabled` (bool)
 - `tags` (map(string))
 
 ## Outputs
@@ -28,3 +28,4 @@ Create Key Vault in RBAC mode for secret access via Managed Identity.
 ## Security Notes
 - Prefer private endpoint + private DNS.
 - Keep purge protection/soft delete aligned with policy.
+- RBAC mode is enforced and public network access is disabled by default in module code.

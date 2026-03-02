@@ -157,6 +157,34 @@ variable "enable_network_telemetry" {
   default     = false
 }
 
+variable "key_vault_sku_name" {
+  description = "SKU for Key Vault."
+  type        = string
+  default     = "standard"
+
+  validation {
+    condition     = contains(["standard", "premium"], lower(var.key_vault_sku_name))
+    error_message = "key_vault_sku_name must be standard or premium."
+  }
+}
+
+variable "key_vault_soft_delete_retention_days" {
+  description = "Soft delete retention period for Key Vault."
+  type        = number
+  default     = 90
+
+  validation {
+    condition     = var.key_vault_soft_delete_retention_days >= 7 && var.key_vault_soft_delete_retention_days <= 90
+    error_message = "key_vault_soft_delete_retention_days must be between 7 and 90."
+  }
+}
+
+variable "key_vault_purge_protection_enabled" {
+  description = "Whether purge protection is enabled for Key Vault."
+  type        = bool
+  default     = false
+}
+
 variable "private_dns_zones" {
   description = "Map of private DNS zones to create, keyed by logical key."
   type = map(object({
