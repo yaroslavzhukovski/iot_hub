@@ -37,3 +37,13 @@ output "subnet_ids" {
   description = "Subnet IDs keyed by subnet key."
   value       = module.network.subnet_ids
 }
+
+output "private_dns_zone_ids" {
+  description = "Private DNS zone IDs keyed by logical zone key."
+  value       = module.private_dns.zone_ids
+}
+
+output "private_dns_vnet_link_ids" {
+  description = "Private DNS VNet link IDs keyed by '<zone_key>|<vnet_id>'."
+  value       = module.private_dns.vnet_link_ids
+}

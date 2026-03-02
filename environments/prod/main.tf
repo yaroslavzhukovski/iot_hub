@@ -35,3 +35,13 @@ module "network" {
   enable_telemetry            = var.enable_network_telemetry
   tags                        = module.naming.tags
 }
+
+module "private_dns" {
+  source = "../../modules/private_dns"
+
+  resource_group_name = module.resource_group.name
+  private_dns_zones   = var.private_dns_zones
+  vnet_ids            = [module.network.vnet_id]
+  registration_enabled = var.registration_enabled
+  tags                = module.naming.tags
+}

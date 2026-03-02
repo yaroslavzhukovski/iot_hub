@@ -156,3 +156,27 @@ variable "enable_network_telemetry" {
   type        = bool
   default     = false
 }
+
+variable "private_dns_zones" {
+  description = "Map of private DNS zones to create, keyed by logical key."
+  type = map(object({
+    name = string
+    tags = optional(map(string), {})
+  }))
+  default = {}
+
+  validation {
+    condition = alltrue([
+      for _, z in var.private_dns_zones :
+      length(trimspace(z.name)) > 0 && can(regex("^[A-Za-z0-9.-]+$", z.name))
+    ])
+    error_message = "Each private DNS zone must have a non-empty valid DNS zone name."
+  }
+}
+
+variable "registration_enabled" {
+  description = "Whether auto-registration is enabled on Private DNS zone links."
+  type        = bool
+  default     = false
+
+}
