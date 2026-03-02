@@ -59,3 +59,12 @@ module "key_vault" {
   purge_protection_enabled   = var.key_vault_purge_protection_enabled
 
 }
+
+module "digital_twins" {
+  source = "../../modules/digital_twins"
+
+  name                = module.naming.names.digital_twins
+  resource_group_name = module.resource_group.name
+  location            = var.digital_twins_location
+  tags                = module.naming.tags
+}

@@ -185,6 +185,17 @@ variable "key_vault_purge_protection_enabled" {
   default     = false
 }
 
+variable "digital_twins_location" {
+  description = "Azure region for Azure Digital Twins."
+  type        = string
+  default     = "westeurope"
+
+  validation {
+    condition     = length(trimspace(var.digital_twins_location)) > 0
+    error_message = "digital_twins_location must not be empty."
+  }
+}
+
 variable "private_dns_zones" {
   description = "Map of private DNS zones to create, keyed by logical key."
   type = map(object({
