@@ -22,3 +22,18 @@ output "resource_group_location" {
   description = "Resource Group location."
   value       = module.resource_group.location
 }
+
+output "vnet_id" {
+  description = "Virtual Network resource ID."
+  value       = module.network.vnet_id
+}
+
+output "vnet_name" {
+  description = "Virtual Network name."
+  value       = module.network.vnet_name
+}
+
+output "subnet_ids" {
+  description = "Subnet IDs keyed by subnet key."
+  value       = module.network.subnet_ids
+}
