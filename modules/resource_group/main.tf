@@ -1,2 +1,5 @@
-# Resource definitions for module 'resource_group'.
-# Keep names parameterized and reusable.
+resource "azurerm_resource_group" "this" {
+  name     = var.name
+  location = var.location
+  tags     = var.tags
+}
