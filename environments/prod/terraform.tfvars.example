@@ -1,0 +1,14 @@
+# Example values only. Do not commit secrets.
+
+# Provider scope
+subscription_id = "00000000-0000-0000-0000-000000000000"
+# tenant_id     = "11111111-1111-1111-1111-111111111111"
+
+# Shared context
+# project             = "iot"
+# environment         = "prod"
+# location_primary    = "swedencentral"
+# location_secondary  = "westeurope"
+# tags = {
+#   owner = "platform"
+# }
