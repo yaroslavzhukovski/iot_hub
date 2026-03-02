@@ -20,3 +20,18 @@ module "resource_group" {
   location = var.location
   tags     = module.naming.tags
 }
+
+module "network" {
+  source = "../../modules/network"
+
+  vnet_name                   = module.naming.names.vnet
+  location                    = var.location
+  parent_id                   = module.resource_group.id
+  address_space               = var.network_address_space
+  subnets                     = var.subnets
+  flow_timeout_in_minutes     = var.flow_timeout_in_minutes
+  enable_vnet_encryption      = var.enable_vnet_encryption
+  vnet_encryption_enforcement = var.vnet_encryption_enforcement
+  enable_telemetry            = var.enable_network_telemetry
+  tags                        = module.naming.tags
+}

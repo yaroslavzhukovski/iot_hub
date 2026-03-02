@@ -77,3 +77,82 @@ variable "additional_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "network_address_space" {
+  description = "VNet address space"
+  type        = list(string)
+  default     = ["10.10.0.0/16"]
+
+  validation {
+    condition     = length(var.network_address_space) > 0 && alltrue([for cidr in var.network_address_space : can(cidrnetmask(cidr))])
+    error_message = "network_address_space must contain at least one valid CIDR block."
+  }
+}
+
+variable "subnets" {
+  description = "Lean subnet map for production baseline."
+  type = map(object({
+    name                              = string
+    address_prefixes                  = list(string)
+    private_endpoint_network_policies = optional(string, "Enabled")
+    delegations = optional(list(object({
+      name = string
+      service_delegation = object({
+        name = string
+      })
+    })), [])
+  }))
+  default = {
+    function_integration = {
+      name             = "function-integration"
+      address_prefixes = ["10.10.10.0/24"]
+    }
+    private_endpoints = {
+      name                              = "private-endpoints"
+      address_prefixes                  = ["10.10.20.0/24"]
+      private_endpoint_network_policies = "Disabled"
+    }
+    management = {
+      name             = "management"
+      address_prefixes = ["10.10.30.0/24"]
+    }
+  }
+
+  validation {
+    condition = alltrue([
+      for _, subnet in var.subnets :
+      length(subnet.address_prefixes) > 0 &&
+      alltrue([for cidr in subnet.address_prefixes : can(cidrnetmask(cidr))])
+    ])
+    error_message = "Each subnet must define at least one valid CIDR in address_prefixes."
+  }
+}
+
+variable "flow_timeout_in_minutes" {
+  description = "Flow timeout in minutes for the virtual network."
+  type        = number
+  default     = 30
+}
+
+variable "enable_vnet_encryption" {
+  description = "Whether to enable encryption for the virtual network."
+  type        = bool
+  default     = false
+}
+
+variable "vnet_encryption_enforcement" {
+  description = "Enforcement mode for virtual network encryption (if enabled)."
+  type        = string
+  default     = "DropUnencrypted"
+
+  validation {
+    condition     = contains(["AllowUnencrypted", "DropUnencrypted"], var.vnet_encryption_enforcement)
+    error_message = "vnet_encryption_enforcement must be AllowUnencrypted or DropUnencrypted."
+  }
+}
+
+variable "enable_network_telemetry" {
+  description = "Enable AVM telemetry in network module."
+  type        = bool
+  default     = false
+}
