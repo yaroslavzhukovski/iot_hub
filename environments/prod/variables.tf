@@ -219,3 +219,94 @@ variable "registration_enabled" {
   default     = false
 
 }
+
+variable "iot_hub_public_network_access_enabled" {
+  description = "Enable public network access for IoT Hub."
+  type        = bool
+  default     = true
+}
+
+variable "iot_hub_local_authentication_enabled" {
+  description = "Enable local authentication (SAS/X.509) for IoT Hub."
+  type        = bool
+  default     = true
+}
+
+variable "iot_hub_network_rule_default_action" {
+  description = "Default action for IoT Hub network rule set."
+  type        = string
+  default     = "Deny"
+
+  validation {
+    condition     = contains(["Deny", "Allow"], var.iot_hub_network_rule_default_action)
+    error_message = "iot_hub_network_rule_default_action must be Deny or Allow."
+  }
+}
+
+variable "iot_hub_network_rule_apply_to_builtin_eventhub_endpoint" {
+  description = "Whether IoT Hub network rules apply to built-in events endpoint."
+  type        = bool
+  default     = false
+}
+
+variable "iot_hub_ip_rules" {
+  description = "IP allow rules for IoT Hub network rule set."
+  type = list(object({
+    name    = string
+    ip_mask = string
+    action  = optional(string, "Allow")
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for r in var.iot_hub_ip_rules :
+      length(trimspace(r.name)) > 0 &&
+      can(cidrnetmask(r.ip_mask)) &&
+      lower(try(r.action, "Allow")) == "allow"
+    ])
+    error_message = "Each iot_hub_ip_rules entry must have non-empty name, valid CIDR ip_mask, and action Allow."
+  }
+}
+
+variable "eventhub_namespace_sku" {
+  description = "Event Hubs namespace SKU."
+  type        = string
+  default     = "Standard"
+}
+
+variable "eventhub_namespace_capacity" {
+  description = "Event Hubs namespace throughput units."
+  type        = number
+  default     = 1
+}
+
+variable "eventhub_partition_count" {
+  description = "Partition count for ingestion Event Hub."
+  type        = number
+  default     = 2
+}
+
+variable "eventhub_message_retention" {
+  description = "Retention days for ingestion Event Hub."
+  type        = number
+  default     = 1
+}
+
+variable "eventhub_public_network_access_enabled" {
+  description = "Enable public network access for Event Hubs namespace."
+  type        = bool
+  default     = false
+}
+
+variable "eventhub_local_authentication_enabled" {
+  description = "Enable local/SAS authentication for Event Hubs namespace."
+  type        = bool
+  default     = false
+}
+
+variable "eventhub_trusted_service_access_enabled" {
+  description = "Allow trusted Microsoft services to bypass Event Hubs firewall."
+  type        = bool
+  default     = true
+}

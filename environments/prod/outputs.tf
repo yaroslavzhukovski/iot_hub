@@ -47,3 +47,38 @@ output "private_dns_vnet_link_ids" {
   description = "Private DNS VNet link IDs keyed by '<zone_key>|<vnet_id>'."
   value       = module.private_dns.vnet_link_ids
 }
+
+output "storage_account_id" {
+  description = "Storage account resource ID."
+  value       = module.storage.storage_account_id
+}
+
+output "storage_account_name" {
+  description = "Storage account name."
+  value       = module.storage.storage_account_name
+}
+
+output "storage_blob_service_uri" {
+  description = "Storage blob service URI."
+  value       = module.storage.blob_service_uri
+}
+
+output "eventhub_namespace_name" {
+  description = "Event Hubs namespace name."
+  value       = module.event_hub.namespace_name
+}
+
+output "eventhub_name" {
+  description = "Ingestion Event Hub name."
+  value       = module.event_hub.eventhub_name
+}
+
+output "function_app_id" {
+  description = "Function Flex app ID."
+  value       = module.function_flex.function_app_id
+}
+
+output "function_app_principal_id" {
+  description = "Function Flex managed identity principal ID."
+  value       = module.function_flex.function_app_principal_id
+}
