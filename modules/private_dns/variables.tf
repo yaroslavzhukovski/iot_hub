@@ -25,9 +25,14 @@ variable "resource_group_name" {
 }
 
 variable "vnet_ids" {
-  description = "Set of VNet resource IDs to link to every private DNS zone."
-  type        = set(string)
-  default     = []
+  description = "Map of VNet IDs keyed by logical VNet key (for stable for_each keys)."
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition     = alltrue([for _, id in var.vnet_ids : length(trimspace(id)) > 0])
+    error_message = "Each vnet_ids value must be a non-empty VNet resource ID."
+  }
 }
 
 variable "registration_enabled" {

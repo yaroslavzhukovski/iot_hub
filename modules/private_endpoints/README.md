@@ -7,7 +7,8 @@ Create reusable Private Endpoints and associate them with Private DNS zones.
 - `resource_group_name` (string)
 - `location` (string)
 - `subnet_id` (string)
-- `endpoints` (map(object)): Target resource ID, subresource names, DNS zone IDs, endpoint name.
+- `private_endpoints` (map(object)): Endpoint name, target resource ID, subresource names, DNS zone IDs, optional tags.
+- `private_dns_zone_group_name` (string)
 - `tags` (map(string))
 
 ## Outputs

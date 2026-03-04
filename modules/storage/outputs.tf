@@ -16,7 +16,8 @@ output "functions_deployment_container_url" {
   value = "https://${azurerm_storage_account.this.name}.blob.core.windows.net/${azurerm_storage_container.functions_deploy.name}"
 }
 
-output "processed_messages_container_name" {
-  description = "Blob container name for processed messages written by Container App."
+output "digital_twin_data_container_name" {
+  description = "Blob container name for digital twin data."
   value       = azurerm_storage_container.digital_twin_data.name
 }
+

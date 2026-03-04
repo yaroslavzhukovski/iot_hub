@@ -6,7 +6,7 @@ Create Private DNS zones and link them to VNet(s).
 ## Inputs
 - `resource_group_name` (string)
 - `private_dns_zones` (map(object)): Zone definitions keyed by logical key (`name`, optional `tags`)
-- `vnet_ids` (set(string))
+- `vnet_ids` (map(string)): VNet IDs keyed by logical VNet key
 - `registration_enabled` (bool, default `false`)
 - `tags` (map(string))
 
