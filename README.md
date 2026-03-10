@@ -64,6 +64,7 @@ flowchart LR
     D[Devices] --> IH[Azure IoT Hub]
     IH --> FA[Azure Function App]
     FA --> DT[Azure Digital Twins]
+    FA --> ST[Azure Storage Account]
 
     subgraph Security
         VNET[Virtual Network]
@@ -73,18 +74,21 @@ flowchart LR
     end
 
     subgraph Observability
+        DS[Diagnostic Settings]
         AI[Application Insights]
         LA[Log Analytics]
         WB[Azure Monitor Workbook]
     end
 
     FA --- VNET
+    ST --- PE
     DT --- PE
     KV --- PE
     FA --> AI
-    FA --> LA
-    IH --> LA
-    DT --> LA
+    IH --> DS
+    DT --> DS
+    ST --> DS
+    DS --> LA
     AI --> WB
     LA --> WB
 ```
