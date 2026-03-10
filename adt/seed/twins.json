@@ -1,0 +1,32 @@
+[
+  {
+    "$dtId": "building-1",
+    "$metadata": {
+      "$model": "dtmi:example:building;1"
+    },
+    "name": "HQ Building"
+  },
+  {
+    "$dtId": "floor-1",
+    "$metadata": {
+      "$model": "dtmi:example:floor;1"
+    },
+    "name": "Floor 1"
+  },
+  {
+    "$dtId": "room-101",
+    "$metadata": {
+      "$model": "dtmi:example:room;1"
+    },
+    "name": "Room 101"
+  },
+  {
+    "$dtId": "thermostat-101",
+    "$metadata": {
+      "$model": "dtmi:example:thermostat;1"
+    },
+    "name": "Thermostat 101",
+    "temperature": 21.5,
+    "humidity": 45.0
+  }
+]

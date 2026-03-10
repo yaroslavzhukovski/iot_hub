@@ -1,0 +1,20 @@
+[
+  {
+    "sourceId": "building-1",
+    "relationshipId": "building-1-contains-floor-1",
+    "relationshipName": "contains",
+    "targetId": "floor-1"
+  },
+  {
+    "sourceId": "floor-1",
+    "relationshipId": "floor-1-contains-room-101",
+    "relationshipName": "contains",
+    "targetId": "room-101"
+  },
+  {
+    "sourceId": "room-101",
+    "relationshipId": "room-101-contains-thermostat-101",
+    "relationshipName": "contains",
+    "targetId": "thermostat-101"
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "@id": "dtmi:example:thermostat;1",
+  "@type": "Interface",
+  "@context": "dtmi:dtdl:context;2",
+  "displayName": "Thermostat",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "name",
+      "schema": "string"
+    },
+    {
+      "@type": "Property",
+      "name": "temperature",
+      "schema": "double"
+    },
+    {
+      "@type": "Property",
+      "name": "humidity",
+      "schema": "double"
+    }
+  ]
+}
