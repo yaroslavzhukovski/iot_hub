@@ -1,6 +1,7 @@
 # Terraform local values
 **/terraform.tfvars
 *.auto.tfvars
+!environments/prod/prod.auto.tfvars
 
 # Terraform local runtime files
 .terraform/
