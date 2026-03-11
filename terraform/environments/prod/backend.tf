@@ -1,2 +1,6 @@
-# Remote backend configuration placeholder.
-# Configure state storage and locking according to your policy.
+terraform {
+  backend "azurerm" {
+    use_oidc         = true
+    use_azuread_auth = true
+  }
+}

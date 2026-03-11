@@ -1,0 +1,185 @@
+name: Terraform - Azure Prod
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "terraform/**/*.tf"
+      - "terraform/**/*.tfvars"
+      - ".github/workflows/terraform_iot_hub.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "terraform/**/*.tf"
+      - "terraform/**/*.tfvars"
+      - ".github/workflows/terraform_iot_hub.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  ARM_USE_OIDC: "true"
+  ARM_USE_AZUREAD: "true"
+  TF_REPO_ROOT: terraform
+  TF_WORKING_DIR: terraform/environments/prod
+  TF_LOCK_TIMEOUT: 5m
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: terraform-checks-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.5
+          terraform_wrapper: false
+
+      - name: Terraform Fmt
+        run: terraform fmt -check -recursive ${{ env.TF_REPO_ROOT }}
+
+      - name: Terraform Init (no backend)
+        run: terraform -chdir=${{ env.TF_WORKING_DIR }} init -backend=false
+
+      - name: Terraform Validate
+        run: terraform -chdir=${{ env.TF_WORKING_DIR }} validate
+
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: checks
+    concurrency:
+      group: terraform-plan-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      id-token: write
+
+    outputs:
+      artifact_name: ${{ steps.meta.outputs.artifact_name }}
+
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_PLAN }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.5
+          terraform_wrapper: false
+
+      - name: Validate Azure auth inputs
+        run: |
+          test -n "${{ vars.AZURE_CLIENT_ID_PLAN }}"
+          test -n "${{ vars.AZURE_TENANT_ID }}"
+          test -n "${{ vars.AZURE_SUBSCRIPTION_ID }}"
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_PLAN }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Terraform Init (remote backend)
+        run: |
+          terraform -chdir=${{ env.TF_WORKING_DIR }} init -reconfigure \
+            -backend-config="resource_group_name=${{ vars.TFSTATE_RESOURCE_GROUP }}" \
+            -backend-config="storage_account_name=${{ vars.TFSTATE_STORAGE_ACCOUNT }}" \
+            -backend-config="container_name=${{ vars.TFSTATE_CONTAINER }}" \
+            -backend-config="key=${{ vars.TFSTATE_KEY_PROD }}"
+
+      - name: Terraform Plan
+        run: terraform -chdir=${{ env.TF_WORKING_DIR }} plan -no-color -lock-timeout=${{ env.TF_LOCK_TIMEOUT }} -out=tfplan
+
+      - name: Render Plan Text
+        run: terraform -chdir=${{ env.TF_WORKING_DIR }} show -no-color tfplan > ${{ github.workspace }}/plan.txt
+
+      - name: Plan Artifact Metadata
+        id: meta
+        run: echo "artifact_name=tfplan-${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.artifact_name }}
+          path: |
+            ${{ env.TF_WORKING_DIR }}/tfplan
+            ${{ github.workspace }}/plan.txt
+          retention-days: 7
+
+  apply:
+    name: Apply (prod)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: plan
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    environment: prod
+    concurrency:
+      group: terraform-apply-prod
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_APPLY }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.5
+          terraform_wrapper: false
+
+      - name: Validate Azure auth inputs
+        run: |
+          test -n "${{ vars.AZURE_CLIENT_ID_APPLY }}"
+          test -n "${{ vars.AZURE_TENANT_ID }}"
+          test -n "${{ vars.AZURE_SUBSCRIPTION_ID }}"
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_APPLY }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Terraform Init (remote backend)
+        run: |
+          terraform -chdir=${{ env.TF_WORKING_DIR }} init -reconfigure \
+            -backend-config="resource_group_name=${{ vars.TFSTATE_RESOURCE_GROUP }}" \
+            -backend-config="storage_account_name=${{ vars.TFSTATE_STORAGE_ACCOUNT }}" \
+            -backend-config="container_name=${{ vars.TFSTATE_CONTAINER }}" \
+            -backend-config="key=${{ vars.TFSTATE_KEY_PROD }}"
+
+      - name: Download Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.plan.outputs.artifact_name }}
+          path: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Apply
+        run: terraform -chdir=${{ env.TF_WORKING_DIR }} apply -auto-approve -no-color -lock-timeout=${{ env.TF_LOCK_TIMEOUT }} tfplan
