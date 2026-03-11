@@ -43,8 +43,8 @@ resource "azurerm_function_app_flex_consumption" "this" {
   app_settings = merge(
     {
       # Storage settings for Functions runtime (required for Flex)
-      "AzureWebJobsStorage__credential"     = "managedidentity"
-      "AzureWebJobsStorage__blobServiceUri" = var.storage_blob_service_uri
+      "AzureWebJobsStorage__credential"      = "managedidentity"
+      "AzureWebJobsStorage__blobServiceUri"  = var.storage_blob_service_uri
       "AzureWebJobsStorage__queueServiceUri" = var.storage_queue_service_uri
       "AzureWebJobsStorage__tableServiceUri" = var.storage_table_service_uri
     },

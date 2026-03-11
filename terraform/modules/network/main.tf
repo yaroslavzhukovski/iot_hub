@@ -1,5 +1,5 @@
 module "vnet" {
-  source = "Azure/avm-res-network-virtualnetwork/azurerm"
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm"
   version = "0.17.1"
 
   name          = var.vnet_name
@@ -17,7 +17,7 @@ module "vnet" {
   encryption = var.enable_vnet_encryption ? {
     enabled     = true
     enforcement = var.vnet_encryption_enforcement
-  } : {
+    } : {
     enabled     = false
     enforcement = "AllowUnencrypted"
   }

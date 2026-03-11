@@ -41,8 +41,8 @@ variable "address_space" {
 variable "subnets" {
   description = "Lean subnet definitions for production baseline."
   type = map(object({
-    name             = string
-    address_prefixes = list(string)
+    name                              = string
+    address_prefixes                  = list(string)
     private_endpoint_network_policies = optional(string, "Enabled")
     delegations = optional(list(object({
       name = string
@@ -51,7 +51,7 @@ variable "subnets" {
       })
     })), [])
   }))
-  default     = {}
+  default = {}
 
   validation {
     condition = alltrue([

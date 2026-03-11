@@ -1,19 +1,19 @@
 locals {
   default_region_short = {
-    swedencentral = "swec"
-    swedensouth   = "swes"
-    westeurope    = "weu"
-    northeurope   = "neu"
-    norwayeast    = "noe"
-    norwaywest    = "now"
-    eastus        = "eus"
-    eastus2       = "eus2"
-    westus2       = "wus2"
-    westus3       = "wus3"
-    centralus     = "cus"
+    swedencentral  = "swec"
+    swedensouth    = "swes"
+    westeurope     = "weu"
+    northeurope    = "neu"
+    norwayeast     = "noe"
+    norwaywest     = "now"
+    eastus         = "eus"
+    eastus2        = "eus2"
+    westus2        = "wus2"
+    westus3        = "wus3"
+    centralus      = "cus"
     southcentralus = "scus"
-    uksouth       = "uks"
-    ukwest        = "ukw"
+    uksouth        = "uks"
+    ukwest         = "ukw"
   }
 
   location_normalized = replace(lower(trimspace(var.location)), "/[^0-9a-z]/", "")
